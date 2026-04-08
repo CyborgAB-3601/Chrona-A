@@ -13,9 +13,17 @@ import MindMapCanvas from '@/components/MindMapCanvas';
 import FloatingActionButton from '@/components/FloatingActionButton';
 import AddItemModal from '@/components/AddItemModal';
 import UpcomingView from '@/components/UpcomingView';
+import CalendarView from '@/components/CalendarView';
+import HabitsView from '@/components/HabitsView';
+import JournalView from '@/components/JournalView';
+import GoalsView from '@/components/GoalsView';
+import ArchiveView from '@/components/ArchiveView';
 
 export default function Home() {
-  // ---- View state: controls what the user sees ----
+  // ---- Main Navigation State (Header) ----
+  const [activeTab, setActiveTab] = useState('Today');
+
+  // ---- Sidebar Navigation State (only relevant for 'Today' tab) ----
   const [currentView, setCurrentView] = useState('Priority Tasks'); // or 'Upcoming'
 
   // ---- Mutable state for positions (enables drag-to-place + live wires) ----
@@ -57,28 +65,41 @@ export default function Home() {
       <PaperGrain />
 
       {/* Fixed header */}
-      <Header />
+      <Header activeView={activeTab} onViewChange={setActiveTab} />
 
-      {/* Fixed sidebar */}
-      <Sidebar 
-        onAddItem={handleAddItem} 
-        activeItem={currentView}
-        onNavigate={setCurrentView}
-      />
-
-      {/* Main Content: Conditionally rendered views */}
-      {currentView === 'Upcoming' ? (
-        <UpcomingView />
-      ) : (
-        <MindMapCanvas
-          categories={categories}
-          tasks={tasks}
-          mePosition={mePosition}
-          onCategoryPositionChange={handleCategoryPositionChange}
-          onTaskPositionChange={handleTaskPositionChange}
-          onMePositionChange={handleMePositionChange}
+      {/* Sidebar navigation - only shown on Today tab */}
+      {activeTab === 'Today' && (
+        <Sidebar 
+          onAddItem={handleAddItem} 
+          activeItem={currentView}
+          onNavigate={setCurrentView}
         />
       )}
+
+      {/* Main Content: Conditionally rendered based on Active Tab & Sidebar currentView */}
+      <div className={`relative z-0 ${activeTab !== 'Today' ? 'w-full px-12 pt-24 min-h-screen' : ''}`}>
+        {activeTab === 'Today' && (
+           <>
+             {currentView === 'Upcoming' && <UpcomingView />}
+             {currentView === 'Priority Tasks' && (
+               <MindMapCanvas
+                 categories={categories}
+                 tasks={tasks}
+                 mePosition={mePosition}
+                 onCategoryPositionChange={handleCategoryPositionChange}
+                 onTaskPositionChange={handleTaskPositionChange}
+                 onMePositionChange={handleMePositionChange}
+               />
+             )}
+             {currentView === 'Long-term Goals' && <GoalsView />}
+             {currentView === 'Archived Logs' && <ArchiveView />}
+           </>
+        )}
+
+        {activeTab === 'Calendar' && <div className="-ml-64 scale-100"><CalendarView /></div>}
+        {activeTab === 'Habits' && <div className="-ml-64 scale-100"><HabitsView /></div>}
+        {activeTab === 'Journal' && <div className="-ml-64 scale-100"><JournalView /></div>}
+      </div>
 
       {/* Floating action button */}
       <FloatingActionButton onClick={handleNewGoal} />
