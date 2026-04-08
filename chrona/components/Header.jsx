@@ -8,9 +8,7 @@ import { useState } from 'react';
 
 const NAV_TABS = ['Today', 'Calendar', 'Habits', 'Journal'];
 
-export default function Header() {
-  const [activeTab, setActiveTab] = useState('Today');
-
+export default function Header({ activeView, onViewChange }) {
   return (
     <header
       id="header-bar"
@@ -38,8 +36,8 @@ export default function Header() {
             <NavTab
               key={tab}
               label={tab}
-              isActive={tab === activeTab}
-              onClick={() => setActiveTab(tab)}
+              isActive={tab === activeView}
+              onClick={() => onViewChange(tab)}
             />
           ))}
         </nav>
@@ -60,12 +58,10 @@ function NavTab({ label, isActive, onClick }) {
     <button
       id={`nav-tab-${label.toLowerCase()}`}
       onClick={onClick}
-      className="transition-transform hover:rotate-1 pb-1"
+      className="transition-transform hover:rotate-1"
       style={{
         color: isActive ? '#ad170c' : '#1c1c18',
         opacity: isActive ? 1 : 0.7,
-        borderBottom: isActive ? '2px solid #ad170c' : '2px solid transparent',
-        fontFamily: 'Space Grotesk, sans-serif',
         background: 'none',
         cursor: 'pointer',
         border: 'none',
@@ -73,6 +69,7 @@ function NavTab({ label, isActive, onClick }) {
         borderBottomStyle: 'solid',
         borderBottomColor: isActive ? '#ad170c' : 'transparent',
         paddingBottom: '4px',
+        fontFamily: 'inherit',
       }}
     >
       {label}
